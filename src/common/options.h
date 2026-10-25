@@ -12,66 +12,69 @@ namespace game {
 inline constexpr const char* kLanguages[] = {"int", "fra", "deu", "ita", "esp", "ind"};
 
 struct Options {
-    bool skip_intros = false;  // logos at boot and the film after pressing start
+    bool skip_intros = false;
     bool fps_counter = false;
-    uint32_t fmv_scale = 0;  // 4:3 films on a wider screen: 0 fill it, top and bottom cut; 1 kept 4:3
-    // a look over the frame: 0 none, 1 and 2 a CRT (light, strong), 3 sharpen, 4 vibrant, 5 noir, 6 sepia,
-    // 7 night vision, 8 VHS
+    uint32_t fmv_scale = 0;
     uint32_t screen_filter = 0;
     bool reload_blur = true;
-    bool bloom = true;  // the glow added over bright parts of the frame (native/vulkan.cpp)
+    bool bloom = true;
     bool fog = true;
-    uint32_t anti_aliasing = 0;  // 0 off, 1 FXAA as the frame goes onto the screen, 2 SSAA: twice the resolution
-    bool hdr = false;  // a tone map that brings back the colours the console's overbright look burns out
-    uint32_t draw_distance = 1;  // times the game's LOD and draw distances
-    // the render resolution follows the frame rate (native/dynamic_resolution.cpp): down when it falls under the
-    // target, up again once it holds the target this many seconds; within min and max, percent of the screen's
+    uint32_t anti_aliasing = 0;
+    bool hdr = false;
+    uint32_t draw_distance = 1;
     bool dynamic_resolution = false;
     uint32_t dynamic_target_fps = 60;
     uint32_t dynamic_min_percent = 40;
     uint32_t dynamic_max_percent = 100;
     uint32_t dynamic_hold = 5;
     float mouse_sensitivity = 1.0f;
-    float touch_sensitivity = 1.0f;  // the touch screen's look, apart from the mouse's
+    float touch_sensitivity = 1.0f;
     bool invert_mouse = false;
-    bool hold_aim = true;  // scopes too, keyboard and mouse
-    uint32_t fov = 70;  // horizontal degrees on a 4:3 frame, 70 is the game's
-    uint32_t viewmodel_fov = 70;  // the gun and arms, the same measure
-    uint32_t walk_speed = 50;  // percent of running, while the walk key is held
-    // a controller's sticks: the radial dead zone as percent of the travel, 0 the game's own, and what the travel
-    // past it is scaled by; the left stick moves, the right looks
+    bool hold_aim = true;
+    uint32_t fov = 70;
+    uint32_t viewmodel_fov = 70;
+    uint32_t walk_speed = 50;
     uint32_t left_deadzone = 0;
     uint32_t right_deadzone = 0;
     float left_sensitivity = 1.0f;
     float right_sensitivity = 1.0f;
-    uint32_t audio_output = 0;  // audio::kOutputAuto, kOutputStereo, kOutputSurround or kOutputMono
-    std::string language = "int";  // one of kLanguages
-    bool infinite_ammo = false;  // cheat: the player's magazine and reserve never go down
-    uint32_t rapid_fire = 1;  // cheat: times the player's rate of fire, 1 the game's
-    bool no_recoil = false;  // cheat: the player's shots do not kick the view
-    uint32_t game_speed = 100;  // cheat: percent of the game's speed, menus and films keep theirs
-    bool god_mode = false;  // cheat: no hit takes the player's health
-    bool one_hit_kill = false;  // cheat: any hit of the player's bullets kills
-    bool infinite_grenades = false;  // cheat: throwing a grenade keeps the count
-    bool unlock_levels = false;  // cheat: every mission open on every difficulty, the save is left as it is
-    bool unlock_black_ops = false;  // cheat: Black Ops open on the missions open on another difficulty, the same
-    bool esp = false;  // cheat: a line from the bottom of the screen and a box to each living enemy
-    bool aimbot = false;  // cheat: aiming in turns the view to the body of the enemy nearest the crosshair
-    std::map<std::string, std::string> keys;  // action id to key names, absent is the default
+    uint32_t audio_output = 0;
+    std::string language = "int";
+    bool infinite_ammo = false;
+    uint32_t rapid_fire = 1;
+    bool no_recoil = false;
+    uint32_t game_speed = 100;
+    bool god_mode = false;
+    bool one_hit_kill = false;
+    bool infinite_grenades = false;
+    bool unlock_levels = false;
+    bool unlock_black_ops = false;
+
+    // ESP settings
+    bool esp = false;           // master toggle: ESP overlay on enemies
+    bool esp_box = true;        // box around each enemy
+    bool esp_line = true;       // line from bottom of screen to each enemy
+    bool esp_skeleton = false;  // skeleton lines on each enemy
+    float esp_max_distance = 0.0f;  // max world units to draw ESP, 0 = unlimited
+    float esp_color_r = 1.0f;   // ESP colour red   (0.0 - 1.0)
+    float esp_color_g = 0.125f; // ESP colour green (0.0 - 1.0)
+    float esp_color_b = 0.125f; // ESP colour blue  (0.0 - 1.0)
+    float esp_color_a = 1.0f;   // ESP opacity      (0.0 - 1.0)
+    float esp_line_thickness = 1.5f;  // line thickness (0.5 - 5.0)
+
+    bool aimbot = false;
+    std::map<std::string, std::string> keys;
 };
 Options& Opt();
-// the language setting as this run started, the language the game boots in
 const std::string& BootLanguage();
-bool HasLanguages();  // language.cpp
-bool LanguageAvailable(const std::string& code);  // language.cpp: the LANGUAGE row offers it
-inline std::atomic<float> g_fps{0};  // from the host, for the game's own counter
-inline std::atomic<bool> g_hide_hud{false};  // the toggle HUD key: the gameplay HUD is not drawn
-// the view's zoom as the look update scales the turn by (src/game/mouse.cpp): 1 none, about 0.74 a rifle's sights,
-// a scope's levels under that (a half at X2, a quarter at X5)
+bool HasLanguages();
+bool LanguageAvailable(const std::string& code);
+inline std::atomic<float> g_fps{0};
+inline std::atomic<bool> g_hide_hud{false};
 inline std::atomic<float> g_zoom{1.0f};
-inline std::atomic<bool> g_focus_paused{false};  // the game thread waits while the app is in the background
-inline std::atomic<uint32_t> g_focus_pauses{0};  // focus pauses ended so far
-void WaitWhileUnfocused();  // native/game_host.cpp: game thread, before the present
-bool HudShown();  // src/game/hud.cpp: the player's HUD drew lately, a hint's pause too
+inline std::atomic<bool> g_focus_paused{false};
+inline std::atomic<uint32_t> g_focus_pauses{0};
+void WaitWhileUnfocused();
+bool HudShown();
 
 }  // namespace game
