@@ -13,7 +13,6 @@ namespace game {
 
 namespace {
 
-// port 0 has the touch controls, the keyboard and mouse; the game sees no input while the panel is open
 void Pad(int port, input::Pad& pad) {
     input::SeenPad(pad);
     if (port == 0) pad.connected = true;
@@ -21,22 +20,26 @@ void Pad(int port, input::Pad& pad) {
     else if (port == 0) input::Keyboard(pad);
 }
 
-// no vibration while the keyboard and mouse are in use
 void Rumble(int port, uint16_t& left, uint16_t& right) {
     if (port != 0 || !input::KeyboardActive()) return;
     left = 0;
     right = 0;
 }
 
-// what the options list cannot hold
 void Load(const void* table) {
     const toml::table& t = *static_cast<const toml::table*>(table);
     Options& o = Opt();
     o.mouse_sensitivity = float(t["mouse_sensitivity"].value_or(double(o.mouse_sensitivity)));
-    // the touch screen followed the mouse's before it had its own: a player's choice carries over
     o.touch_sensitivity = float(t["touch_sensitivity"].value_or(double(o.mouse_sensitivity)));
     o.left_sensitivity = float(t["left_stick_sensitivity"].value_or(double(o.left_sensitivity)));
     o.right_sensitivity = float(t["right_stick_sensitivity"].value_or(double(o.right_sensitivity)));
+    // ESP float settings
+    o.esp_color_r = float(t["esp_color_r"].value_or(double(o.esp_color_r)));
+    o.esp_color_g = float(t["esp_color_g"].value_or(double(o.esp_color_g)));
+    o.esp_color_b = float(t["esp_color_b"].value_or(double(o.esp_color_b)));
+    o.esp_color_a = float(t["esp_color_a"].value_or(double(o.esp_color_a)));
+    o.esp_line_thickness = float(t["esp_line_thickness"].value_or(double(o.esp_line_thickness)));
+    o.esp_max_distance = float(t["esp_max_distance"].value_or(double(o.esp_max_distance)));
     std::string language = t["language"].value_or(o.language);
     bool known = std::find(std::begin(kLanguages), std::end(kLanguages), language) != std::end(kLanguages);
     if (known) o.language = language;
@@ -45,9 +48,8 @@ void Load(const void* table) {
             if (auto v = value.value<std::string>()) o.keys[std::string(id.str())] = *v;
 }
 
-// after the settings load, before boot
 void Init() {
-    BootLanguage();  // latched before the options can change the setting
+    BootLanguage();
     input::LoadBindings();
     audio::SetOutputMode(Opt().audio_output);
 }
@@ -59,6 +61,13 @@ void Save(void* table) {
     t.insert("touch_sensitivity", double(o.touch_sensitivity));
     t.insert("left_stick_sensitivity", double(o.left_sensitivity));
     t.insert("right_stick_sensitivity", double(o.right_sensitivity));
+    // ESP float settings
+    t.insert("esp_color_r", double(o.esp_color_r));
+    t.insert("esp_color_g", double(o.esp_color_g));
+    t.insert("esp_color_b", double(o.esp_color_b));
+    t.insert("esp_color_a", double(o.esp_color_a));
+    t.insert("esp_line_thickness", double(o.esp_line_thickness));
+    t.insert("esp_max_distance", double(o.esp_max_distance));
     t.insert("language", o.language);
     toml::table keys;
     for (const auto& [id, value] : o.keys) keys.insert(id, value);
@@ -125,12 +134,6 @@ const app::GameInfo app::kGame = {
                 {"esp_box", &game::Opt().esp_box, nullptr},
                 {"esp_line", &game::Opt().esp_line, nullptr},
                 {"esp_skeleton", &game::Opt().esp_skeleton, nullptr},
-                {"esp_max_distance", nullptr, nullptr, &game::Opt().esp_max_distance},
-                {"esp_color_r", nullptr, nullptr, &game::Opt().esp_color_r},
-                {"esp_color_g", nullptr, nullptr, &game::Opt().esp_color_g},
-                {"esp_color_b", nullptr, nullptr, &game::Opt().esp_color_b},
-                {"esp_color_a", nullptr, nullptr, &game::Opt().esp_color_a},
-                {"esp_line_thickness", nullptr, nullptr, &game::Opt().esp_line_thickness},
                 {"aimbot", &game::Opt().aimbot, nullptr}},
     .load = game::Load,
     .save = game::Save,
