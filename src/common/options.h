@@ -57,6 +57,16 @@ struct Options {
     bool unlock_black_ops = false;  // cheat: Black Ops open on the missions open on another difficulty, the same
     bool esp = false;  // cheat: a line from the bottom of the screen and a box to each living enemy
     bool aimbot = false;  // cheat: aiming in turns the view to the body of the enemy nearest the crosshair
+    // ESP customization
+    bool esp_box = true;             // cheat: bounding box around each enemy
+    bool esp_skeleton = true;        // cheat: skeleton bones drawn over each enemy
+    bool esp_line = true;            // cheat: line from the bottom of the screen to each enemy
+    bool esp_distance = true;        // cheat: distance label in metres next to each enemy
+    float esp_max_distance = 100.0f; // cheat: enemies beyond this distance (metres) are not drawn
+    float esp_r = 1.0f;              // cheat: ESP colour red channel (0.0 - 1.0)
+    float esp_g = 0.125f;            // cheat: ESP colour green channel (0.0 - 1.0)
+    float esp_b = 0.125f;            // cheat: ESP colour blue channel (0.0 - 1.0)
+    float esp_a = 1.0f;              // cheat: ESP colour alpha / opacity (0.0 - 1.0)
     std::map<std::string, std::string> keys;  // action id to key names, absent is the default
 };
 Options& Opt();
