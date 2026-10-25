@@ -4,11 +4,8 @@
 #include <map>
 #include <string>
 
-// the game's own settings, in the settings file through app::kGame.options
 namespace game {
 
-// the languages, saved by these codes: English, French, German, Italian, Spanish, Indonesian. Indonesian is the
-// recomp's own text only: the game files have none, so the game itself stays in English
 inline constexpr const char* kLanguages[] = {"int", "fra", "deu", "ita", "esp", "ind"};
 
 struct Options {
@@ -49,19 +46,17 @@ struct Options {
     bool infinite_grenades = false;
     bool unlock_levels = false;
     bool unlock_black_ops = false;
-
-    // ESP settings
-    bool esp = false;           // master toggle: ESP overlay on enemies
-    bool esp_box = true;        // box around each enemy
-    bool esp_line = true;       // line from bottom of screen to each enemy
-    bool esp_skeleton = false;  // skeleton lines on each enemy
-    float esp_max_distance = 0.0f;  // max world units to draw ESP, 0 = unlimited
-    float esp_color_r = 1.0f;   // ESP colour red   (0.0 - 1.0)
-    float esp_color_g = 0.125f; // ESP colour green (0.0 - 1.0)
-    float esp_color_b = 0.125f; // ESP colour blue  (0.0 - 1.0)
-    float esp_color_a = 1.0f;   // ESP opacity      (0.0 - 1.0)
-    float esp_line_thickness = 1.5f;  // line thickness (0.5 - 5.0)
-
+    // ESP
+    bool esp = false;
+    bool esp_box = true;
+    bool esp_line = true;
+    bool esp_skeleton = false;
+    uint32_t esp_max_distance = 0;   // 0 = unlimited, in metres
+    uint32_t esp_color_r = 100;      // 0-100 percent
+    uint32_t esp_color_g = 12;
+    uint32_t esp_color_b = 12;
+    uint32_t esp_color_a = 100;
+    uint32_t esp_thickness = 15;     // 10-50, divided by 10 = 1.0-5.0
     bool aimbot = false;
     std::map<std::string, std::string> keys;
 };
