@@ -22,24 +22,16 @@ void Pad(int port, input::Pad& pad) {
 
 void Rumble(int port, uint16_t& left, uint16_t& right) {
     if (port != 0 || !input::KeyboardActive()) return;
-    left = 0;
-    right = 0;
+    left = 0; right = 0;
 }
 
 void Load(const void* table) {
     const toml::table& t = *static_cast<const toml::table*>(table);
     Options& o = Opt();
-    o.mouse_sensitivity = float(t["mouse_sensitivity"].value_or(double(o.mouse_sensitivity)));
-    o.touch_sensitivity = float(t["touch_sensitivity"].value_or(double(o.mouse_sensitivity)));
-    o.left_sensitivity = float(t["left_stick_sensitivity"].value_or(double(o.left_sensitivity)));
-    o.right_sensitivity = float(t["right_stick_sensitivity"].value_or(double(o.right_sensitivity)));
-    // ESP float settings
-    o.esp_color_r = float(t["esp_color_r"].value_or(double(o.esp_color_r)));
-    o.esp_color_g = float(t["esp_color_g"].value_or(double(o.esp_color_g)));
-    o.esp_color_b = float(t["esp_color_b"].value_or(double(o.esp_color_b)));
-    o.esp_color_a = float(t["esp_color_a"].value_or(double(o.esp_color_a)));
-    o.esp_line_thickness = float(t["esp_line_thickness"].value_or(double(o.esp_line_thickness)));
-    o.esp_max_distance = float(t["esp_max_distance"].value_or(double(o.esp_max_distance)));
+    o.mouse_sensitivity  = float(t["mouse_sensitivity"].value_or(double(o.mouse_sensitivity)));
+    o.touch_sensitivity  = float(t["touch_sensitivity"].value_or(double(o.mouse_sensitivity)));
+    o.left_sensitivity   = float(t["left_stick_sensitivity"].value_or(double(o.left_sensitivity)));
+    o.right_sensitivity  = float(t["right_stick_sensitivity"].value_or(double(o.right_sensitivity)));
     std::string language = t["language"].value_or(o.language);
     bool known = std::find(std::begin(kLanguages), std::end(kLanguages), language) != std::end(kLanguages);
     if (known) o.language = language;
@@ -57,17 +49,10 @@ void Init() {
 void Save(void* table) {
     toml::table& t = *static_cast<toml::table*>(table);
     const Options& o = Opt();
-    t.insert("mouse_sensitivity", double(o.mouse_sensitivity));
-    t.insert("touch_sensitivity", double(o.touch_sensitivity));
-    t.insert("left_stick_sensitivity", double(o.left_sensitivity));
+    t.insert("mouse_sensitivity",       double(o.mouse_sensitivity));
+    t.insert("touch_sensitivity",       double(o.touch_sensitivity));
+    t.insert("left_stick_sensitivity",  double(o.left_sensitivity));
     t.insert("right_stick_sensitivity", double(o.right_sensitivity));
-    // ESP float settings
-    t.insert("esp_color_r", double(o.esp_color_r));
-    t.insert("esp_color_g", double(o.esp_color_g));
-    t.insert("esp_color_b", double(o.esp_color_b));
-    t.insert("esp_color_a", double(o.esp_color_a));
-    t.insert("esp_line_thickness", double(o.esp_line_thickness));
-    t.insert("esp_max_distance", double(o.esp_max_distance));
     t.insert("language", o.language);
     toml::table keys;
     for (const auto& [id, value] : o.keys) keys.insert(id, value);
@@ -89,59 +74,65 @@ const std::string& BootLanguage() {
 }  // namespace game
 
 const app::GameInfo app::kGame = {
-    .title = L"Black",
+    .title       = L"Black",
     .short_title = L"Black",
-    .name = L"Black",
-    .log = "black",
-    .settings = "black.toml",
-    .splash = nullptr,
-    .missing = L"Put the game in the Black folder on the phone's storage: its disc image (.iso), or default.xbe with "
-               L"GlobData.bin and the chars, data, export, language, levels, sound and videos folders beside it.",
-    .images = {{"default.xbe", "Black"}},
-    .options = {{"skip_intros", &game::Opt().skip_intros, nullptr},
-                {"fps_counter", &game::Opt().fps_counter, nullptr},
-                {"reload_blur", &game::Opt().reload_blur, nullptr},
-                {"bloom", &game::Opt().bloom, nullptr},
-                {"fog", &game::Opt().fog, nullptr},
-                {"anti_aliasing", nullptr, &game::Opt().anti_aliasing},
-                {"hdr", &game::Opt().hdr, nullptr},
-                {"fmv_scale", nullptr, &game::Opt().fmv_scale},
-                {"screen_filter", nullptr, &game::Opt().screen_filter},
-                {"invert_mouse", &game::Opt().invert_mouse, nullptr},
-                {"hold_aim", &game::Opt().hold_aim, nullptr},
-                {"walk_speed", nullptr, &game::Opt().walk_speed},
-                {"left_stick_deadzone", nullptr, &game::Opt().left_deadzone},
+    .name        = L"Black",
+    .log         = "black",
+    .settings    = "black.toml",
+    .splash      = nullptr,
+    .missing     = L"Put the game in the Black folder on the phone's storage: its disc image (.iso), or default.xbe with "
+                   L"GlobData.bin and the chars, data, export, language, levels, sound and videos folders beside it.",
+    .images  = {{"default.xbe", "Black"}},
+    .options = {{"skip_intros",          &game::Opt().skip_intros,          nullptr},
+                {"fps_counter",          &game::Opt().fps_counter,          nullptr},
+                {"reload_blur",          &game::Opt().reload_blur,          nullptr},
+                {"bloom",                &game::Opt().bloom,                nullptr},
+                {"fog",                  &game::Opt().fog,                  nullptr},
+                {"anti_aliasing",        nullptr, &game::Opt().anti_aliasing},
+                {"hdr",                  &game::Opt().hdr,                  nullptr},
+                {"fmv_scale",            nullptr, &game::Opt().fmv_scale},
+                {"screen_filter",        nullptr, &game::Opt().screen_filter},
+                {"invert_mouse",         &game::Opt().invert_mouse,         nullptr},
+                {"hold_aim",             &game::Opt().hold_aim,             nullptr},
+                {"walk_speed",           nullptr, &game::Opt().walk_speed},
+                {"left_stick_deadzone",  nullptr, &game::Opt().left_deadzone},
                 {"right_stick_deadzone", nullptr, &game::Opt().right_deadzone},
-                {"fov", nullptr, &game::Opt().fov},
-                {"draw_distance", nullptr, &game::Opt().draw_distance},
-                {"dynamic_resolution", &game::Opt().dynamic_resolution, nullptr},
-                {"dynamic_target_fps", nullptr, &game::Opt().dynamic_target_fps},
-                {"dynamic_min_percent", nullptr, &game::Opt().dynamic_min_percent},
-                {"dynamic_max_percent", nullptr, &game::Opt().dynamic_max_percent},
-                {"dynamic_hold", nullptr, &game::Opt().dynamic_hold},
-                {"viewmodel_fov", nullptr, &game::Opt().viewmodel_fov},
-                {"audio_output", nullptr, &game::Opt().audio_output},
-                {"infinite_ammo", &game::Opt().infinite_ammo, nullptr},
-                {"rapid_fire", nullptr, &game::Opt().rapid_fire},
-                {"no_recoil", &game::Opt().no_recoil, nullptr},
-                {"game_speed", nullptr, &game::Opt().game_speed},
-                {"god_mode", &game::Opt().god_mode, nullptr},
-                {"one_hit_kill", &game::Opt().one_hit_kill, nullptr},
-                {"infinite_grenades", &game::Opt().infinite_grenades, nullptr},
-                {"unlock_levels", &game::Opt().unlock_levels, nullptr},
-                {"unlock_black_ops", &game::Opt().unlock_black_ops, nullptr},
-                {"esp", &game::Opt().esp, nullptr},
-                {"esp_box", &game::Opt().esp_box, nullptr},
-                {"esp_line", &game::Opt().esp_line, nullptr},
-                {"esp_skeleton", &game::Opt().esp_skeleton, nullptr},
-                {"aimbot", &game::Opt().aimbot, nullptr}},
-    .load = game::Load,
-    .save = game::Save,
-    .init = game::Init,
-    .loaded = nullptr,
-    .window = nullptr,
+                {"fov",                  nullptr, &game::Opt().fov},
+                {"draw_distance",        nullptr, &game::Opt().draw_distance},
+                {"dynamic_resolution",   &game::Opt().dynamic_resolution,   nullptr},
+                {"dynamic_target_fps",   nullptr, &game::Opt().dynamic_target_fps},
+                {"dynamic_min_percent",  nullptr, &game::Opt().dynamic_min_percent},
+                {"dynamic_max_percent",  nullptr, &game::Opt().dynamic_max_percent},
+                {"dynamic_hold",         nullptr, &game::Opt().dynamic_hold},
+                {"viewmodel_fov",        nullptr, &game::Opt().viewmodel_fov},
+                {"audio_output",         nullptr, &game::Opt().audio_output},
+                {"infinite_ammo",        &game::Opt().infinite_ammo,        nullptr},
+                {"rapid_fire",           nullptr, &game::Opt().rapid_fire},
+                {"no_recoil",            &game::Opt().no_recoil,            nullptr},
+                {"game_speed",           nullptr, &game::Opt().game_speed},
+                {"god_mode",             &game::Opt().god_mode,             nullptr},
+                {"one_hit_kill",         &game::Opt().one_hit_kill,         nullptr},
+                {"infinite_grenades",    &game::Opt().infinite_grenades,    nullptr},
+                {"unlock_levels",        &game::Opt().unlock_levels,        nullptr},
+                {"unlock_black_ops",     &game::Opt().unlock_black_ops,     nullptr},
+                {"esp",                  &game::Opt().esp,                  nullptr},
+                {"esp_box",              &game::Opt().esp_box,              nullptr},
+                {"esp_line",             &game::Opt().esp_line,             nullptr},
+                {"esp_skeleton",         &game::Opt().esp_skeleton,         nullptr},
+                {"esp_max_distance",     nullptr, &game::Opt().esp_max_distance},
+                {"esp_color_r",          nullptr, &game::Opt().esp_color_r},
+                {"esp_color_g",          nullptr, &game::Opt().esp_color_g},
+                {"esp_color_b",          nullptr, &game::Opt().esp_color_b},
+                {"esp_color_a",          nullptr, &game::Opt().esp_color_a},
+                {"esp_thickness",        nullptr, &game::Opt().esp_thickness},
+                {"aimbot",               &game::Opt().aimbot,               nullptr}},
+    .load    = game::Load,
+    .save    = game::Save,
+    .init    = game::Init,
+    .loaded  = nullptr,
+    .window  = nullptr,
     .message = nullptr,
-    .ui = app::DrawUi,
-    .pad = game::Pad,
-    .rumble = game::Rumble,
+    .ui      = app::DrawUi,
+    .pad     = game::Pad,
+    .rumble  = game::Rumble,
 };
